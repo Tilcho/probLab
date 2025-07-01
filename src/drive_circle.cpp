@@ -9,8 +9,9 @@ class CircleDriver : public rclcpp::Node
 {
 public:
     CircleDriver()
-    : Node("circle_driver")
+    : Node("drive_circle")
     {
+        RCLCPP_INFO(this->get_logger(), "Circle movement node started");
         publisher_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("/cmd_vel", 10);
         timer_ = this->create_wall_timer(100ms, std::bind(&CircleDriver::drive_in_circle, this));
 
@@ -18,9 +19,9 @@ public:
         angular_velocity_ = 0.5;  // rad/s
         stop_velocity_ = 0;
     }
-    void stop_robot()
+    void stopping()
     {
-        RCLCPP_INFO(this->get_logger(), "Node shutting down, stop publishing cmd_vel");
+        RCLCPP_INFO(this->get_logger(), "Circle node shutting down");
         auto twist_stamped = geometry_msgs::msg::TwistStamped();
         twist_stamped.header.stamp = this->get_clock()->now();
         twist_stamped.header.frame_id = "base_link";
@@ -29,7 +30,6 @@ public:
         twist_stamped.twist.angular.z = stop_velocity_;
 
         publisher_->publish(twist_stamped);
-        rclcpp::sleep_for(100ms);  // give time for message to be sent
     }
 private:
     void drive_in_circle()
@@ -56,7 +56,7 @@ int main(int argc, char * argv[])
     rclcpp::init(argc, argv);
     auto node = std::make_shared<CircleDriver>();
     rclcpp::spin(node);
-    node->stop_robot();  // Call explicitly before shutdown
+    node->stopping();
     rclcpp::shutdown();
     return 0;
 }

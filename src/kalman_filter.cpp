@@ -5,13 +5,13 @@
 // ===========================
 
 KalmanFilter::KalmanFilter() {
-    x_ = Eigen::VectorXd::Zero(6);                         // Initial state vector: [x, x_dot, y, y_dot, theta, omega]
-    S_ = Eigen::MatrixXd::Identity(6, 6) * 0.1;            // Initial state covariance matrix with small uncertainty
-    A_ = Eigen::MatrixXd::Identity(6, 6);                  // State transition model (updated each step with dt)
-    B_ = Eigen::MatrixXd::Zero(6, 2);                      // Control input model (to be filled with motion info)
-    R_ = Eigen::MatrixXd::Identity(6, 6) * 0.001;          // Process noise covariance (small assumed noise)
-    C_ = Eigen::MatrixXd::Zero(3, 6);                      // Observation model (updated in correct())
-    Q_ = Eigen::MatrixXd::Identity(3, 3) * 0.1;            // Measurement noise covariance
+    x_ = Eigen::VectorXd::Zero(6);                   // Initial state vector: [x, x_dot, y, y_dot, theta, omega]
+    S_ = Eigen::MatrixXd::Identity(6, 6) * 0.001;    // Initial state covariance matrix with small uncertainty
+    A_ = Eigen::MatrixXd::Identity(6, 6);            // State transition model (updated each step with dt)
+    B_ = Eigen::MatrixXd::Zero(6, 2);                // Control input model (to be filled with motion info)
+    R_ = Eigen::MatrixXd::Identity(6, 6) * 0.01;     // Process noise covariance (small assumed noise)
+    C_ = Eigen::MatrixXd::Zero(3, 6);                // Observation model (updated in correct())
+    Q_ = Eigen::MatrixXd::Identity(3, 3);            // Measurement noise covariance
 }
 
 void KalmanFilter::predict(const geometry_msgs::msg::Twist& u, double dt) {
@@ -119,7 +119,7 @@ geometry_msgs::msg::PoseWithCovarianceStamped KalmanFilter::correct(
     
     // Differential drive kinematics
     x_vel_calc = (v_left + v_right) / 2;          // Forward velocity
-    omega_calc = (v_right - v_left) / wheelbase_;   // Angular velocity from wheels
+    omega_calc = (v_right - v_left) / wheelbase_; // Angular velocity from wheels
 
     // Create measurement vector: [x_vel, y_vel, omega]
     Eigen::Vector3d z;

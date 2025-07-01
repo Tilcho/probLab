@@ -72,15 +72,15 @@ ament_target_dependencies(navigator
 )
 
 # === Circle Driver Node ===
-add_executable(circle_driver src/circle_driver.cpp)
-ament_target_dependencies(circle_driver
+add_executable(drive_circle src/drive_circle.cpp)
+ament_target_dependencies(drive_circle
   rclcpp
   geometry_msgs
 )
 
-# === Stop Robot Node ===
-add_executable(stop_robot src/stop_robot.cpp)
-ament_target_dependencies(stop_robot
+# === Circle Rectangle Node ===
+add_executable(drive_rectangle src/drive_rectangle.cpp)
+ament_target_dependencies(drive_rectangle
   rclcpp
   geometry_msgs
 )
@@ -99,8 +99,8 @@ install(TARGETS
   pf_node
   pose_logger
   navigator
-  circle_driver
-  stop_robot
+  drive_circle
+  drive_rectangle
   cmd_vel_watchdog
   DESTINATION lib/${PROJECT_NAME}
 )

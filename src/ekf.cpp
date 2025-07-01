@@ -6,7 +6,7 @@
 
 ExtendedKalmanFilter::ExtendedKalmanFilter() {
     x_ = Eigen::VectorXd::Zero(6); // [x_pos, x_vel, y_pos, y_vel, theta, omega]
-    P_ = Eigen::MatrixXd::Identity(6, 6) * 0.1;
+    P_ = Eigen::MatrixXd::Identity(6, 6) * 0.01;
     F_ = Eigen::MatrixXd::Identity(6, 6); // Jacobian of motion model
     H_ = Eigen::MatrixXd::Zero(3, 6);     // Jacobian of observation model
     Q_ = Eigen::MatrixXd::Identity(6, 6); // Process noise
