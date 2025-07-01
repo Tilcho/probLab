@@ -15,9 +15,9 @@ public:
       state_(State::DRIVE),
       side_count_(0),
       linear_velocity_(0.2),        // m/s
-      angular_velocity_(0.55),       // rad/s
+      angular_velocity_(0.5),       // rad/s
       drive_duration_(rclcpp::Duration::from_seconds(0.5 / linear_velocity_)),
-      turn_duration_(rclcpp::Duration::from_seconds(3.9))
+      turn_duration_(rclcpp::Duration::from_seconds(3.6))
     {
         RCLCPP_INFO(this->get_logger(), "Rectangle driving node started");
 
