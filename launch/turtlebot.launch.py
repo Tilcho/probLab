@@ -68,6 +68,32 @@ def generate_launch_description():
         output='screen'
     )
 
+    kf = Node(
+        package='localization_filters',
+        executable='kf_node',
+        name='kf_node',
+        output='screen'
+    )
+    ekf = Node(
+        package='localization_filters',
+        executable='ekf_node',
+        name='ekf_node',
+        output='screen'
+    )
+    pf = Node(
+        package='localization_filters',
+        executable='pf_node',
+        name='pf_node',
+        output='screen'
+    )
+    logger = Node(
+        package='localization_filters',
+        executable='pose_logger',
+        name='pose_logger',
+        output='screen'
+    )
+
+
     ld = LaunchDescription()
     
     # Add the commands to the launch description
@@ -77,5 +103,9 @@ def generate_launch_description():
     ld.add_action(robot_state_publisher_cmd)
     ld.add_action(set_env_vars_resources)
     ld.add_action(watchdog_node)
+    ld.add_action(kf)
+    ld.add_action(ekf)
+    ld.add_action(pf)
+    ld.add_action(logger)
 
     return ld

@@ -20,7 +20,7 @@ public:
     }
     void stop_robot()
     {
-        //RCLCPP_INFO(this->get_logger(), "Node shutting down, sending zero velocity...");
+        RCLCPP_INFO(this->get_logger(), "Node shutting down, stop publishing cmd_vel");
         auto twist_stamped = geometry_msgs::msg::TwistStamped();
         twist_stamped.header.stamp = this->get_clock()->now();
         twist_stamped.header.frame_id = "base_link";
