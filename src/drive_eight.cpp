@@ -16,10 +16,10 @@ public:
         publisher_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("/cmd_vel", 10);
         timer_ = this->create_wall_timer(100ms, std::bind(&EightDriver::drive_in_eight, this));
 
-        linear_velocity_ = 0.2;   // m/s
+        linear_velocity_ = 0.15;   // m/s
         angular_velocity_ = 1;  // max rad/s
         stop_velocity_ = 0.0;
-        phase_step_ = 0.1;        // controls how fast phase_ increases
+        phase_step_ = 0.05;        // controls how fast phase_ increases
     }
 
     void stopping()
@@ -43,7 +43,7 @@ private:
         twist_stamped.header.frame_id = "base_link";
 
         twist_stamped.twist.linear.x = linear_velocity_;
-        twist_stamped.twist.angular.z = angular_velocity_ * std::sin(phase_ * 1);
+        twist_stamped.twist.angular.z = angular_velocity_ * std::sin(phase_);
 
         publisher_->publish(twist_stamped);
     }

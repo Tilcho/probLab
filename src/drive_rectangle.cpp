@@ -5,31 +5,31 @@
 
 using namespace std::chrono_literals;
 
-enum class State { DRIVE, TURN };
+enum class State { DRIVE, ARC };
 
-class RectangleDriver : public rclcpp::Node
+class RoundedSquareDriver : public rclcpp::Node
 {
 public:
-    RectangleDriver()
-    : Node("drive_rectangle"),
+    RoundedSquareDriver()
+    : Node("drive_rounded_square"),
       state_(State::DRIVE),
-      side_count_(0),
+      segment_count_(0),
       linear_velocity_(0.2),        // m/s
-      angular_velocity_(0.5),       // rad/s
-      drive_duration_(rclcpp::Duration::from_seconds(0.5 / linear_velocity_)),
-      turn_duration_(rclcpp::Duration::from_seconds(3.6))
+      angular_velocity_(1),       // rad/s (for arcs)
+      straight_duration_(rclcpp::Duration::from_seconds(1.5)),  // time per side
+      arc_duration_(rclcpp::Duration::from_seconds(M_PI_2 / angular_velocity_)) // ~90° turn as arc
     {
-        RCLCPP_INFO(this->get_logger(), "Rectangle driving node started");
+        RCLCPP_INFO(this->get_logger(), "Rounded square node started");
 
         publisher_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("/cmd_vel", 10);
-        timer_ = this->create_wall_timer(100ms, std::bind(&RectangleDriver::step, this));
+        timer_ = this->create_wall_timer(100ms, std::bind(&RoundedSquareDriver::step, this));
 
         action_start_time_ = this->now();
     }
 
     void stop()
     {
-        RCLCPP_INFO(this->get_logger(), "Rectangle driving node stopped");
+        RCLCPP_INFO(this->get_logger(), "Rounded square node stopped");
         publish_velocity(0.0, 0.0);
     }
 
@@ -41,30 +41,30 @@ private:
 
         if (state_ == State::DRIVE)
         {
-            if (elapsed < drive_duration_)
+            if (elapsed < straight_duration_)
             {
                 publish_velocity(linear_velocity_, 0.0);
             }
             else
             {
-                state_ = State::TURN;
+                state_ = State::ARC;
                 action_start_time_ = now;
-                publish_velocity(0.0, angular_velocity_);
+                publish_velocity(linear_velocity_, angular_velocity_);
             }
         }
-        else if (state_ == State::TURN)
+        else if (state_ == State::ARC)
         {
-            if (elapsed < turn_duration_)
+            if (elapsed < arc_duration_)
             {
-                publish_velocity(0.0, angular_velocity_);
+                publish_velocity(linear_velocity_, angular_velocity_);
             }
             else
             {
-                side_count_++;
-                if (side_count_ >= 4)
+                segment_count_++;
+                if (segment_count_ >= 4)
                 {
                     stop();
-                    rclcpp::shutdown();  // Stop the node after completing the rectangle
+                    rclcpp::shutdown();
                     return;
                 }
                 state_ = State::DRIVE;
@@ -89,16 +89,16 @@ private:
     rclcpp::Time action_start_time_;
 
     State state_;
-    int side_count_;
+    int segment_count_;
     double linear_velocity_, angular_velocity_;
-    rclcpp::Duration drive_duration_, turn_duration_;
+    rclcpp::Duration straight_duration_, arc_duration_;
 };
 
 int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
-    auto node = std::make_shared<RectangleDriver>();
+    auto node = std::make_shared<RoundedSquareDriver>();
     rclcpp::spin(node);
-    node->stop();  // Send zero velocity once more (optional)
+    node->stop();
     return 0;
 }
