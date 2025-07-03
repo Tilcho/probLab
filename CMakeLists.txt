@@ -16,7 +16,6 @@ find_package(geometry_msgs REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(nav2_msgs REQUIRED)
 find_package(tf2 REQUIRED)
-find_package(tf2_geometry_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 include_directories(
@@ -100,18 +99,6 @@ ament_target_dependencies(cmd_vel_watchdog
   geometry_msgs
 )
 
-# === Testing Foreign Code ===
-add_executable(kf_david src/kf_david.cpp)
-ament_target_dependencies(kf_david
-  rclcpp
-  geometry_msgs
-  sensor_msgs
-  nav_msgs
-  message_filters
-  tf2
-  tf2_geometry_msgs
-)
-
 # === Install All Binaries ===
 install(TARGETS
   kf_node
@@ -123,7 +110,6 @@ install(TARGETS
   drive_rectangle
   drive_eight
   cmd_vel_watchdog
-  kf_david
   DESTINATION lib/${PROJECT_NAME}
 )
 

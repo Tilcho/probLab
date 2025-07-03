@@ -26,7 +26,9 @@ struct Particle {
 class ParticleFilter {
 public:
     ParticleFilter(size_t num_particles = 100);
+    double gaussian_prob(double mu, double sigma, double x);
     void predict(double v, double w, double dt);
+    void correct(double measured_omega, double predicted_omega);
     void resample();
     geometry_msgs::msg::PoseWithCovarianceStamped estimate_pose();
 
