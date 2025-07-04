@@ -8,23 +8,23 @@
 ExtendedKalmanFilter::ExtendedKalmanFilter() {
     x_ = Eigen::VectorXd::Zero(6); // State vector: [x_pos, x_vel, y_pos, y_vel, theta, omega]
     P_ = Eigen::MatrixXd::Identity(6, 6) * 0.01; // Initial covariance matrix with small uncertainty
-    F_ = Eigen::MatrixXd::Identity(6, 6); // Jacobian of the motion model
+    G_ = Eigen::MatrixXd::Identity(6, 6); // Jacobian of the motion model
     H_ = Eigen::MatrixXd::Zero(3, 6);     // Jacobian of the measurement model
 
-    // Process noise covariance matrix Q_
-    Q_ = Eigen::MatrixXd::Identity(6, 6);
-    Q_(0, 0) = 0.01;  // Noise for x_pos
-    Q_(1, 1) = 0.1;   // Noise for x_vel
-    Q_(2, 2) = 0.01;  // Noise for y_pos
-    Q_(3, 3) = 0.1;   // Noise for y_vel
-    Q_(4, 4) = 0.001; // Noise for theta
-    Q_(5, 5) = 0.01;  // Noise for omega
+    // Process noise covariance matrix R_
+    R_ = Eigen::MatrixXd::Identity(6, 6);
+    R_(0, 0) = 0.01;  // Noise for x_pos
+    R_(1, 1) = 0.1;   // Noise for x_vel
+    R_(2, 2) = 0.01;  // Noise for y_pos
+    R_(3, 3) = 0.1;   // Noise for y_vel
+    R_(4, 4) = 0.001; // Noise for theta
+    R_(5, 5) = 0.01;  // Noise for omega
 
-    // Measurement noise covariance matrix R_
-    R_ = Eigen::MatrixXd::Identity(3, 3);
-    R_(0, 0) = 0.05;  // Noise for x_vel (from encoders)
-    R_(1, 1) = 0.01;   // Noise for y_vel (often assumed near-zero)
-    R_(2, 2) = 0.02;  // Noise for angular velocity omega (from IMU)
+    // Measurement noise covariance matrix Q_
+    Q_ = Eigen::MatrixXd::Identity(3, 3);
+    Q_(0, 0) = 0.05;  // Noise for x_vel (from encoders)
+    Q_(1, 1) = 0.01;   // Noise for y_vel (often assumed near-zero)
+    Q_(2, 2) = 0.02;  // Noise for angular velocity omega (from IMU)
 }
 
 // Prediction step of EKF using control input (velocity and angular rate)
@@ -43,16 +43,16 @@ void ExtendedKalmanFilter::predict(const geometry_msgs::msg::Twist& u, double dt
     x_(3) = v * std::sin(theta); // y_vel
     x_(5) = w;                   // omega
 
-    // Update motion model Jacobian matrix F_
-    F_.setIdentity();
-    F_(0, 4) = -v * std::sin(theta) * dt;
-    F_(2, 4) = v * std::cos(theta) * dt;
-    F_(0, 1) = dt;
-    F_(2, 3) = dt;
-    F_(4, 5) = dt;
+    // Update motion model Jacobian matrix G_
+    G_.setIdentity();
+    G_(0, 4) = -v * std::sin(theta) * dt;
+    G_(2, 4) = v * std::cos(theta) * dt;
+    G_(0, 1) = dt;
+    G_(2, 3) = dt;
+    G_(4, 5) = dt;
 
     // Update covariance matrix using Jacobian and process noise
-    P_ = F_ * P_ * F_.transpose() + Q_;
+    P_ = G_ * P_ * G_.transpose() + R_;
 
     // Normalize angle to [-π, π]
     while (x_(4) > M_PI) x_(4) -= 2 * M_PI;
@@ -93,7 +93,7 @@ geometry_msgs::msg::PoseWithCovarianceStamped ExtendedKalmanFilter::correct(
     Eigen::Vector3d y = z - H_ * x_;
 
     // Compute innovation covariance
-    Eigen::Matrix3d S = H_ * P_ * H_.transpose() + R_;
+    Eigen::Matrix3d S = H_ * P_ * H_.transpose() + Q_;
     // Compute Kalman gain
     Eigen::MatrixXd K = P_ * H_.transpose() * S.inverse();
 

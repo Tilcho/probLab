@@ -12,11 +12,6 @@ ParticleFilter::ParticleFilter(size_t num_particles)
     }
 }
 
-// Computes the Gaussian probability density for value x given mean mu and standard deviation sigma
-double ParticleFilter::gaussian_prob(double mu, double sigma, double x) {
-    return std::exp(-0.5 * std::pow((x - mu) / sigma, 2)) / (sigma * std::sqrt(2.0 * M_PI));
-}
-
 // Applies motion model with added Gaussian noise to each particle
 void ParticleFilter::predict(double v, double w, double dt) {
     for (auto& p : particles_) {
@@ -24,6 +19,11 @@ void ParticleFilter::predict(double v, double w, double dt) {
         p.y += v * std::sin(p.theta) * dt + noise_y_(rng_);
         p.theta += w * dt + noise_theta_(rng_);
     }
+}
+
+// Computes the Gaussian probability density for value x given mean mu and standard deviation sigma
+double ParticleFilter::gaussian_prob(double mu, double sigma, double x) {
+    return std::exp(-0.5 * std::pow((x - mu) / sigma, 2)) / (sigma * std::sqrt(2.0 * M_PI));
 }
 
 // Updates particle weights based on how closely predicted omega matches the IMU measurement

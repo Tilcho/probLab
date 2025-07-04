@@ -25,10 +25,10 @@ public:
 private:
     Eigen::VectorXd x_; // State vector (6x1): [x_pos, x_vel, y_pos, y_vel, theta, omega]
     Eigen::MatrixXd P_; // Covariance matrix (6x6)
-    Eigen::MatrixXd F_; // Jacobian of motion model (6x6)
+    Eigen::MatrixXd G_; // Jacobian of motion model (6x6)
     Eigen::MatrixXd H_; // Jacobian of observation model (3x6)
-    Eigen::MatrixXd Q_; // Process noise covariance (6x6)
-    Eigen::MatrixXd R_; // Measurement noise covariance (3x3)
+    Eigen::MatrixXd R_; // Process noise covariance (6x6)
+    Eigen::MatrixXd Q_; // Measurement noise covariance (3x3)
 
     const double wheelbase_ = 0.160;  // TurtleBot3 wheelbase in meters
     const double wheel_rad_ = 0.033;  // TurtleBot3 wheel radius in meters
